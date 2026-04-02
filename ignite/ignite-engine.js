@@ -525,7 +525,8 @@ export class IgniteAnalysis {
       ev.sourceIsFriendly &&
       !ev.targetIsFriendly &&
       isFireSchool &&
-      spellId !== IGNITE_SPELL_ID // Ignite ticks are handled separately
+      spellId !== IGNITE_SPELL_ID && // Ignite ticks are handled separately
+      !ev.tick // Exclude periodic damage (e.g. Pyroblast DoT) — only direct hits trigger Ignite
     ) {
       const mage = this.mageStats.get(ev.sourceID);
       if (!mage) return; // Not a mage we're tracking
