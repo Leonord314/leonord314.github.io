@@ -4,9 +4,9 @@
  * Manages report/fight selection, Plotly graphs, and summary tables.
  */
 
-import { fetchWCLv1 } from "../era/threat/wcl.js";
+import { fetchWCLv1 } from "./wcl.js";
 import { IgniteAnalysis } from "./ignite-engine.js";
-import { getColor } from "../era/colors.js";
+import { getColor } from "./colors.js";
 
 const SCROLLBAR_WIDTH = 16;
 

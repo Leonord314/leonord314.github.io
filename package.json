@@ -1,8 +1,8 @@
 {
-  "name": "wcl-threat-link",
+  "name": "ignitalyzer",
   "private": true,
   "version": "1.0.0",
-  "main": "threat/front.js",
+  "main": "ignite/front.js",
   "type": "module",
   "scripts": {
     "start": "npx http-server ./",
