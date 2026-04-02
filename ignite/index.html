@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="main.js" type="module"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Ignitalyzer</title>
+    <style>
+        body {
+          margin: 0;
+          min-height: 2000px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body, #input * {
+          background-color: #222;
+          color: #fff;
+        }
+
+        #input :disabled {
+          color: #555;
+        }
+
+        h2 {
+          margin: 10px 20px;
+          color: #ff8800;
+        }
+
+        h3 {
+          margin: 10px 20px;
+          color: #ff8800;
+        }
+
+        table {
+          border-collapse: collapse;
+        }
+
+        td, th {
+          height: 20px;
+          border: 1px solid #555;
+          padding: 4px 8px;
+        }
+
+        th {
+          background-color: #333;
+          color: #ff8800;
+        }
+
+        #input input, #input select {
+          min-width: 350px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        #input button {
+          width: 100px;
+        }
+
+        #input {
+          padding: 10px 20px;
+        }
+
+        .section {
+          margin: 10px 20px;
+        }
+
+        .section h3 {
+          margin: 10px 0;
+          border-bottom: 1px solid #444;
+          padding-bottom: 5px;
+        }
+
+        #fightStats table {
+          margin: 5px 0;
+          width: auto;
+        }
+
+        .nav-links {
+          margin: 10px 20px;
+          font-size: 14px;
+        }
+
+        .nav-links a {
+          color: #40c7eb;
+        }
+
+        #statusText {
+          color: #ff8800;
+          margin-left: 10px;
+          font-style: italic;
+        }
+
+        #summaryTable table,
+        #segmentsTable table {
+          margin: 5px 0;
+          width: auto;
+        }
+
+        .info-panel {
+          margin: 20px;
+          padding: 10px;
+          background: #2a2a2a;
+          border: 1px solid #444;
+          border-radius: 4px;
+          font-size: 14px;
+          color: #ccc;
+        }
+
+        .info-panel p {
+          margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Ignitalyzer</h2>
+
+<div id="input">
+    <table>
+        <tr>
+            <td>Report ID</td>
+            <td><input type="text" id="reportSelect" placeholder="Paste WCL report URL or ID"/></td>
+            <td>
+                <button onclick="selectReport()">Fetch</button>
+            </td>
+        </tr>
+        <tr>
+            <td>Fight</td>
+            <td><select id="fightSelect"></select></td>
+            <td>
+                <button onclick="selectFight()">Analyze</button>
+            </td>
+        </tr>
+        <tr>
+            <td>Enemy</td>
+            <td colspan="2">
+                <select id="enemySelect" onchange="selectEnemy()"></select>
+            </td>
+        </tr>
+    </table>
+    <span id="statusText"></span>
+</div>
+
+<div class="section">
+    <div id="igniteValueGraph"></div>
+</div>
+
+<div class="section">
+    <div id="cooldownTimeline"></div>
+</div>
+
+<div class="section">
+    <div id="igniteThreatGraph"></div>
+</div>
+
+<div class="section">
+    <div id="critTimelineGraph"></div>
+</div>
+
+<div class="section">
+    <h3>Fight Statistics</h3>
+    <div id="fightStats"></div>
+</div>
+
+<div class="section">
+    <h3>Mage Contributions</h3>
+    <div id="summaryTable"></div>
+</div>
+
+<div class="section">
+    <h3>Ignite Segments</h3>
+    <div id="segmentsTable"></div>
+</div>
+
+<div class="info-panel">
+    <p><strong>How to use:</strong></p>
+    <p>1. Go to Warcraft Logs and copy your report URL or ID</p>
+    <p>2. Paste it above and click "Fetch" to load the report</p>
+    <p>3. Select a fight and click "Analyze"</p>
+    <p>4. Select which enemy to view Ignite data for</p>
+    <p><strong>What this shows:</strong></p>
+    <p>Tracks the shared Ignite debuff across all fire mages. Shows stack value over time,
+    who owns the Ignite, when it rolls vs drops, per-mage contribution stats, and threat attribution.</p>
+    <p>Private logs cannot be imported (WCL API restriction).</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "WCL Threat Link",
+  "description": "Link Warcraft logs to Classic WoW Threat Graph",
+  "version": "1.4",
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": ["*://*.classic.warcraftlogs.com/reports/*"],
+      "js": ["addButtonClassic.js"]
+    },
+    {
+      "matches": ["*://*.vanilla.warcraftlogs.com/reports/*"],
+      "js": ["addButtonEra.js"]
+    },
+    {
+      "matches": ["*://*.fresh.warcraftlogs.com/reports/*"],
+      "js": ["addButtonFresh.js"]
+    },
+    {
+      "matches": ["*://*.sod.warcraftlogs.com/reports/*"],
+      "js": ["addButtonSod.js"]
+    }
+  ]
+}
