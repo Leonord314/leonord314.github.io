@@ -402,11 +402,11 @@ function plotCooldownTimeline(timeline) {
   const fightDuration = (timeline.fightEnd - timeline.fightStart) / 1000;
 
   // Each mage gets a horizontal "lane" (y-value).
-  const annotations = [];
   const yLabels = [];
 
   // Group intervals by cooldown name so each becomes a toggleable trace
-  const tracesByName = new Map(); // name -> { color, rects: [{x0,x1,y}] }
+  // Each entry also collects label positions for a paired text trace
+  const tracesByName = new Map(); // name -> { color, opacity, rects, labels }
 
   for (let i = 0; i < magesWithCooldowns.length; i++) {
     const { mageId, mage } = magesWithCooldowns[i];
@@ -421,15 +421,11 @@ function plotCooldownTimeline(timeline) {
       if (x1 <= 0 || x0 >= fightDuration) continue;
 
       if (!tracesByName.has(cd.name)) {
-        tracesByName.set(cd.name, { color: cd.color, opacity: 0.7, rects: [] });
+        tracesByName.set(cd.name, { color: cd.color, opacity: 0.7, textColor: "#fff", rects: [], labels: [] });
       }
-      tracesByName.get(cd.name).rects.push({ x0, x1, y });
-
-      const midX = (x0 + x1) / 2;
-      annotations.push({
-        x: midX, y, text: cd.name, showarrow: false,
-        font: { color: "#fff", size: 10 },
-      });
+      const entry = tracesByName.get(cd.name);
+      entry.rects.push({ x0, x1, y });
+      entry.labels.push({ x: (x0 + x1) / 2, y, text: cd.name });
     }
 
     // Power Infusion intervals
@@ -440,25 +436,20 @@ function plotCooldownTimeline(timeline) {
       if (x1 <= 0 || x0 >= fightDuration) continue;
 
       if (!tracesByName.has("Power Infusion")) {
-        tracesByName.set("Power Infusion", { color: "#ffffff", opacity: 0.5, rects: [] });
+        tracesByName.set("Power Infusion", { color: "#ffffff", opacity: 0.5, textColor: "#222", rects: [], labels: [] });
       }
-      tracesByName.get("Power Infusion").rects.push({ x0, x1, y });
-
-      const midX = (x0 + x1) / 2;
-      annotations.push({
-        x: midX, y, text: "PI", showarrow: false,
-        font: { color: "#222", size: 10, family: "Arial Black" },
-      });
+      const entry = tracesByName.get("Power Infusion");
+      entry.rects.push({ x0, x1, y });
+      entry.labels.push({ x: (x0 + x1) / 2, y, text: "PI" });
     }
   }
 
-  // Build one trace per cooldown type using fill:'toself' rectangles
+  // Build one fill trace + one text trace per cooldown type, linked by legendgroup
   const plotData = [];
-  for (const [name, { color, opacity, rects }] of tracesByName) {
+  for (const [name, { color, opacity, textColor, rects, labels }] of tracesByName) {
     const xs = [];
     const ys = [];
     for (const r of rects) {
-      // Draw a closed rectangle: bottom-left -> bottom-right -> top-right -> top-left -> close + null separator
       xs.push(r.x0, r.x1, r.x1, r.x0, r.x0, null);
       ys.push(r.y - 0.35, r.y - 0.35, r.y + 0.35, r.y + 0.35, r.y - 0.35, null);
     }
@@ -471,6 +462,17 @@ function plotCooldownTimeline(timeline) {
       mode: "lines",
       name,
       hoverinfo: "name",
+      legendgroup: name,
+    });
+    // Text trace for labels — same legendgroup so it toggles with the bars
+    plotData.push({
+      x: labels.map((l) => l.x),
+      y: labels.map((l) => l.y),
+      text: labels.map((l) => l.text),
+      mode: "text",
+      textfont: { color: textColor, size: 10 },
+      hoverinfo: "none",
+      showlegend: false,
       legendgroup: name,
     });
   }
@@ -506,7 +508,6 @@ function plotCooldownTimeline(timeline) {
       range: [-0.5, magesWithCooldowns.length - 0.5],
       fixedrange: true,
     },
-    annotations,
     width: window.innerWidth - SCROLLBAR_WIDTH,
     height: 300,
     hovermode: false,
