@@ -9,6 +9,7 @@ import { IgniteAnalysis } from "./ignite-engine.js";
 import { getColor } from "./colors.js";
 
 const SCROLLBAR_WIDTH = 16;
+const PLOT_MARGIN_LEFT = 150;
 
 /** Convert a hex color like "#ff8800" to "rgba(255, 136, 0, alpha)" */
 function hexToRgba(hex, alpha) {
@@ -369,6 +370,7 @@ function plotIgniteValue(timeline) {
     },
     width: window.innerWidth - SCROLLBAR_WIDTH,
     height: 400,
+    margin: { l: PLOT_MARGIN_LEFT },
     hovermode: "closest",
     plot_bgcolor: "#222",
     paper_bgcolor: "#222",
@@ -511,6 +513,7 @@ function plotCooldownTimeline(timeline) {
     },
     width: window.innerWidth - SCROLLBAR_WIDTH,
     height: 300,
+    margin: { l: PLOT_MARGIN_LEFT },
     hovermode: false,
     plot_bgcolor: "#222",
     paper_bgcolor: "#222",
@@ -597,6 +600,7 @@ function plotDebuffTimeline(timeline) {
     },
     width: window.innerWidth - SCROLLBAR_WIDTH,
     height: 200 + debuffNames.length * 30,
+    margin: { l: PLOT_MARGIN_LEFT },
     hovermode: false,
     plot_bgcolor: "#222",
     paper_bgcolor: "#222",
@@ -723,6 +727,7 @@ function plotIgniteThreat(timeline) {
     shapes: taShapes,
     width: window.innerWidth - SCROLLBAR_WIDTH,
     height: 350,
+    margin: { l: PLOT_MARGIN_LEFT },
     hovermode: "closest",
     plot_bgcolor: "#222",
     paper_bgcolor: "#222",
@@ -836,6 +841,7 @@ function plotCritTimeline(timeline) {
     shapes: piShapes,
     width: window.innerWidth - SCROLLBAR_WIDTH,
     height: 300,
+    margin: { l: PLOT_MARGIN_LEFT },
     hovermode: "closest",
     plot_bgcolor: "#222",
     paper_bgcolor: "#222",
