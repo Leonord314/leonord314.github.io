@@ -61,7 +61,7 @@ async function fetchIgniteEvents(reportId, start, end) {
     `(type = "damage" AND source.type = "Player" AND ability.type = 4)` +
     ` OR (type = "damage" AND ability.id = 12654)` +
     ` OR (type IN ("applydebuff", "refreshdebuff", "removedebuff") AND ability.id IN (12654, 1490, 11721, 11722, 22959, 23605, 9658))` +
-    ` OR (type IN ("applybuff", "removebuff") AND ability.id IN (25909, 10060, 23271, 24659, 23723, 28779, 29977, 12043))` +
+    ` OR (type IN ("applybuff", "removebuff") AND ability.id IN (25909, 10060, 23271, 24659, 23723, 28779, 29977, 12042, 12043))` +
     ` OR (type = "death" AND target.type != "Player")` +
     ` OR type = "combatantinfo"`
   );

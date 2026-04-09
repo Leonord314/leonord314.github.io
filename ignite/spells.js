@@ -81,7 +81,8 @@ export const TRACKED_COOLDOWNS = {
   23723: { name: "MQG", color: "#cc44ff" },          // Mind Quickening Gem
   28779: { name: "Sapphiron", color: "#00aadd" },    // Essence of Sapphiron (Restrained Essence)
   29977: { name: "Combustion", color: "#ff4400" },   // Combustion
-  12043: { name: "AP", color: "#4488ff" },            // Arcane Power
+  12042: { name: "AP", color: "#4488ff" },            // Arcane Power (buff)
+  12043: { name: "AP", color: "#4488ff" },            // Arcane Power (cast)
 };
 
 /** All tracked cooldown buff IDs as a Set */
