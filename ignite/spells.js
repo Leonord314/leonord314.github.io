@@ -87,6 +87,26 @@ export const TRACKED_COOLDOWNS = {
 /** All tracked cooldown buff IDs as a Set */
 export const TRACKED_COOLDOWN_IDS = new Set(Object.keys(TRACKED_COOLDOWNS).map(Number));
 
+/**
+ * Tracked enemy debuffs that boost fire damage.
+ * Multiple spell IDs may map to the same debuff (different ranks).
+ */
+export const TRACKED_DEBUFFS = {
+  // Curse of Elements (Ranks 1-3) — reduces fire/frost resistance
+  1490:  { name: "Curse of Elements", color: "#8787ed" },
+  11721: { name: "Curse of Elements", color: "#8787ed" },
+  11722: { name: "Curse of Elements", color: "#8787ed" },
+  // Fire Vulnerability (Improved Scorch) — +3% fire damage per stack, up to 5
+  22959: { name: "Fire Vulnerability", color: "#ff6622" },
+  // Spell Vulnerability (Nightfall axe proc) — +15% spell damage
+  23605: { name: "Spell Vulnerability", color: "#cc44ff" },
+  // Flame Buffet (Arcanite Dragonling) — reduces fire resistance, stacks
+  9658:  { name: "Flame Buffet", color: "#ff4444" },
+};
+
+/** All tracked debuff spell IDs as a Set */
+export const TRACKED_DEBUFF_IDS = new Set(Object.keys(TRACKED_DEBUFFS).map(Number));
+
 /** WCL hit types */
 export const HitType = {
   Miss: 0,

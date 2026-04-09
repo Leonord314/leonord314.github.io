@@ -60,7 +60,7 @@ async function fetchIgniteEvents(reportId, start, end) {
   const filter = encodeURI(
     `(type = "damage" AND source.type = "Player" AND ability.type = 4)` +
     ` OR (type = "damage" AND ability.id = 12654)` +
-    ` OR (type IN ("applydebuff", "refreshdebuff", "removedebuff") AND ability.id = 12654)` +
+    ` OR (type IN ("applydebuff", "refreshdebuff", "removedebuff") AND ability.id IN (12654, 1490, 11721, 11722, 22959, 23605, 9658))` +
     ` OR (type IN ("applybuff", "removebuff") AND ability.id IN (25909, 10060, 23271, 24659, 23723, 28779, 29977, 12043))` +
     ` OR (type = "death" AND target.type != "Player")` +
     ` OR type = "combatantinfo"`
@@ -207,6 +207,7 @@ export function selectEnemy() {
 
   plotIgniteValue(timeline);
   plotCooldownTimeline(timeline);
+  plotDebuffTimeline(timeline);
   plotIgniteThreat(timeline);
   plotCritTimeline(timeline);
   renderSummaryTable(timeline);
@@ -514,6 +515,92 @@ function plotCooldownTimeline(timeline) {
     plot_bgcolor: "#222",
     paper_bgcolor: "#222",
     legend: { font: { color: "#fff" }, orientation: "h", y: -0.15 },
+  });
+}
+
+// ── Subplot: Enemy Debuff Timeline ──
+
+function plotDebuffTimeline(timeline) {
+  const el = document.getElementById("debuffTimeline");
+  el.innerHTML = "";
+
+  if (!currentAnalysis) return;
+
+  const intervals = currentAnalysis.debuffIntervals.get(timeline.enemyId) || [];
+  if (intervals.length === 0) {
+    el.textContent = "No tracked debuffs detected on this target.";
+    return;
+  }
+
+  const fightDuration = (timeline.fightEnd - timeline.fightStart) / 1000;
+
+  // Group intervals by debuff name — each gets a horizontal lane
+  const debuffNames = [];
+  const tracesByName = new Map();
+
+  for (const db of intervals) {
+    if (!tracesByName.has(db.name)) {
+      tracesByName.set(db.name, { color: db.color, rects: [], labels: [] });
+      debuffNames.push(db.name);
+    }
+    const entry = tracesByName.get(db.name);
+    const x0 = Math.max(0, (db.start - timeline.fightStart) / 1000);
+    const x1 = Math.min(fightDuration, (db.end - timeline.fightStart) / 1000);
+    if (x1 <= 0 || x0 >= fightDuration) continue;
+
+    const y = debuffNames.indexOf(db.name);
+    entry.rects.push({ x0, x1, y });
+  }
+
+  const plotData = [];
+  for (const [name, { color, rects }] of tracesByName) {
+    const xs = [];
+    const ys = [];
+    for (const r of rects) {
+      xs.push(r.x0, r.x1, r.x1, r.x0, r.x0, null);
+      ys.push(r.y - 0.35, r.y - 0.35, r.y + 0.35, r.y + 0.35, r.y - 0.35, null);
+    }
+    plotData.push({
+      x: xs,
+      y: ys,
+      fill: "toself",
+      fillcolor: hexToRgba(color, 0.7),
+      line: { width: 1, color: "#fff" },
+      mode: "lines",
+      name,
+      hoverinfo: "name",
+    });
+  }
+
+  globalThis.Plotly.newPlot(el, plotData, {
+    title: `Enemy Debuffs - ${timeline.enemyName}`,
+    titlefont: { color: "#fff", size: 13 },
+    xaxis: {
+      title: "Time (s)",
+      titlefont: { color: "#fff", size: 11 },
+      tickcolor: "#666",
+      tickfont: { color: "#fff" },
+      rangemode: "tozero",
+      gridcolor: "#444",
+      linecolor: "#999",
+      range: [0, fightDuration],
+    },
+    yaxis: {
+      tickmode: "array",
+      tickvals: debuffNames.map((_, i) => i),
+      ticktext: debuffNames,
+      tickfont: { color: "#fff", size: 11 },
+      gridcolor: "#333",
+      linecolor: "#999",
+      range: [-0.5, debuffNames.length - 0.5],
+      fixedrange: true,
+    },
+    width: window.innerWidth - SCROLLBAR_WIDTH,
+    height: 200 + debuffNames.length * 30,
+    hovermode: false,
+    plot_bgcolor: "#222",
+    paper_bgcolor: "#222",
+    legend: { font: { color: "#fff" }, orientation: "h", y: -0.2 },
   });
 }
 

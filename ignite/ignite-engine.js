@@ -16,6 +16,8 @@ import {
   POWER_INFUSION_BUFF_ID,
   TRACKED_COOLDOWN_IDS,
   TRACKED_COOLDOWNS,
+  TRACKED_DEBUFF_IDS,
+  TRACKED_DEBUFFS,
 } from "./spells.js";
 
 /**
@@ -443,6 +445,15 @@ export class IgniteAnalysis {
     this.cooldownIntervals = new Map();
     /** @type {Map<string, number>} key = "playerId-spellId" */
     this._cooldownActive = new Map();
+
+    /**
+     * Enemy debuff uptime intervals per enemy ID.
+     * Each entry is an array of {start, end, spellId, name, color}.
+     * @type {Map<number, {start: number, end: number, spellId: number, name: string, color: string}[]>}
+     */
+    this.debuffIntervals = new Map();
+    /** @type {Map<string, number>} key = "enemyId-spellId" */
+    this._debuffActive = new Map();
   }
 
   /**
@@ -502,6 +513,24 @@ export class IgniteAnalysis {
         spellId,
         name: cd ? cd.name : `${spellId}`,
         color: cd ? cd.color : "#888",
+      });
+    }
+
+    // Close any tracked debuff intervals that were still active at fight end
+    for (const [key, startTime] of this._debuffActive) {
+      const [enemyIdStr, spellIdStr] = key.split("-");
+      const enemyId = parseInt(enemyIdStr);
+      const spellId = parseInt(spellIdStr);
+      if (!this.debuffIntervals.has(enemyId)) {
+        this.debuffIntervals.set(enemyId, []);
+      }
+      const db = TRACKED_DEBUFFS[spellId];
+      this.debuffIntervals.get(enemyId).push({
+        start: startTime,
+        end: this.fightEnd,
+        spellId,
+        name: db ? db.name : `${spellId}`,
+        color: db ? db.color : "#888",
       });
     }
 
@@ -679,6 +708,31 @@ export class IgniteAnalysis {
           color: cd.color,
         });
         this._cooldownActive.delete(key);
+      }
+    }
+
+    // Tracked enemy debuffs (Curse of Elements, Fire Vulnerability, Spell Vulnerability, Flame Buffet)
+    if (ev.type === "applydebuff" && TRACKED_DEBUFF_IDS.has(spellId) && !ev.targetIsFriendly) {
+      const key = ev.targetID + "-" + spellId;
+      this._debuffActive.set(key, ev.timestamp);
+    }
+
+    if (ev.type === "removedebuff" && TRACKED_DEBUFF_IDS.has(spellId) && !ev.targetIsFriendly) {
+      const key = ev.targetID + "-" + spellId;
+      const startTime = this._debuffActive.get(key);
+      if (startTime !== undefined) {
+        if (!this.debuffIntervals.has(ev.targetID)) {
+          this.debuffIntervals.set(ev.targetID, []);
+        }
+        const db = TRACKED_DEBUFFS[spellId];
+        this.debuffIntervals.get(ev.targetID).push({
+          start: startTime,
+          end: ev.timestamp,
+          spellId,
+          name: db.name,
+          color: db.color,
+        });
+        this._debuffActive.delete(key);
       }
     }
   }
